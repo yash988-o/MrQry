@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-tertiary: var(--bg-tertiary);
+  --color-bg-overlay: var(--bg-overlay);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+
+  --color-accent-violet: var(--accent-violet);
+  --color-accent-green: var(--accent-green);
+  --color-accent-amber: var(--accent-amber);
+  --color-accent-red: var(--accent-red);
+
+  --color-mukki-cyan: var(--mukki-cyan);
+  --color-ghalib-orange: var(--ghalib-orange);
+  --color-zadugarni-pink: var(--zadugarni-pink);
+
+  --color-accent-active: var(--accent-active);
+
+  --font-display: var(--font-space-grotesk);
+  --font-body: var(--font-plus-jakarta-sans);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+:root {
+  /* ── Backgrounds ── */
+  --bg-primary: #0B0C10;
+  --bg-secondary: #13141A;
+  --bg-tertiary: #1C1E27;
+  --bg-overlay: #0D0E14;
+
+  /* ── Text ── */
+  --text-primary: #F0F0F5;
+  --text-secondary: #9395A5;
+  --text-muted: #4A4C5E;
+
+  /* ── Primary Accent (static definition) ── */
+  --accent-violet: #7C6AF7;
+  --accent-violet-glow: rgba(124, 106, 247, 0.25);
+
+  /* ── Semantic ── */
+  --accent-green: #4ADE80;
+  --accent-amber: #FBBF24;
+  --accent-red: #F87171;
+
+  /* ── AI Companion Identity (FIXED — never change) ── */
+  --mukki-cyan: #22D3EE;
+  --ghalib-orange: #FB923C;
+  --zadugarni-pink: #F472B6;
+
+  /* ── Surfaces & Effects ── */
+  --glass-surface: rgba(255, 255, 255, 0.04);
+  --glass-border: rgba(255, 255, 255, 0.07);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow-glow-violet: 0 0 32px rgba(124, 106, 247, 0.3);
+
+  /* ══ DYNAMIC ACCENT — ALL COMPONENTS USE THESE ══ */
+  --accent-active: var(--accent-violet);
+  --accent-active-glow: var(--accent-violet-glow);
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Base styles for scrollbar (optional but fits the dark theme) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
