@@ -14,6 +14,7 @@ export default function AuthForm() {
   const initialMode = searchParams.get("mode") === "signup" ? "signup" : "signin";
   const [mode, setMode] = useState<"signin" | "signup">(initialMode);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSignUpSuccess, setIsSignUpSuccess] = useState(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -41,11 +42,11 @@ export default function AuthForm() {
           password,
           options: {
             data: { full_name: name },
-            emailRedirectTo: `${location.origin}/auth/callback?next=/dashboard`,
+            // Removed emailRedirectTo so it defaults to the Site URL (homepage) perfectly.
           },
         });
         if (signUpError) throw signUpError;
-        router.push("/dashboard");
+        setIsSignUpSuccess(true);
       } else {
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
@@ -82,14 +83,41 @@ export default function AuthForm() {
           {mode === "signin" ? "Welcome back" : "Create an account"}
         </h2>
         <p className="text-text-secondary">
-          {mode === "signin"
+          {isSignUpSuccess 
+            ? "We've sent a verification link to your email."
+            : mode === "signin"
             ? "Enter your details to access your dashboard."
             : "Join Mercury and start learning scientifically."}
         </p>
       </div>
 
       <div className="bg-bg-secondary border border-glass-border rounded-2xl p-8 shadow-shadow-card">
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        {isSignUpSuccess ? (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex flex-col items-center text-center py-8"
+          >
+            <div className="w-16 h-16 bg-accent-active/20 rounded-full flex items-center justify-center mb-6">
+              <Mail className="w-8 h-8 text-accent-active" />
+            </div>
+            <h3 className="text-2xl font-display font-bold text-text-primary mb-3">Check your inbox</h3>
+            <p className="text-text-secondary mb-8 leading-relaxed">
+              We just sent a confirmation link to <span className="text-text-primary font-medium">{email}</span>. 
+              Please click the link in the email to verify your account, then you can sign in below.
+            </p>
+            <Button 
+              onClick={() => {
+                setIsSignUpSuccess(false);
+                setMode("signin");
+              }} 
+              className="w-full h-12"
+            >
+              Continue to Sign In
+            </Button>
+          </motion.div>
+        ) : (
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <AnimatePresence mode="popLayout">
             {mode === "signup" && (
               <motion.div
@@ -165,15 +193,18 @@ export default function AuthForm() {
             {!isLoading && <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />}
           </Button>
         </form>
+        )}
 
-        <div className="mt-8 text-center text-sm">
-          <span className="text-text-secondary">
-            {mode === "signin" ? "Don't have an account? " : "Already have an account? "}
-          </span>
-          <button onClick={toggleMode} className="text-accent-active font-semibold hover:underline">
-            {mode === "signin" ? "Sign up" : "Sign in"}
-          </button>
-        </div>
+        {!isSignUpSuccess && (
+          <div className="mt-8 text-center text-sm">
+            <span className="text-text-secondary">
+              {mode === "signin" ? "Don't have an account? " : "Already have an account? "}
+            </span>
+            <button onClick={toggleMode} className="text-accent-active font-semibold hover:underline">
+              {mode === "signin" ? "Sign up" : "Sign in"}
+            </button>
+          </div>
+        )}
 
         {/* Demo Bypass Link */}
         <div className="mt-6 text-center">
