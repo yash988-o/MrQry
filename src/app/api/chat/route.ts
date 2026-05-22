@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Configure the specific model instance
-    const model = genAI.getModel({
+    const model = genAI.getGenerativeModel({
       model: modelName,
       systemInstruction,
       tools,
