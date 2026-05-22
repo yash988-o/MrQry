@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from "react";
+import { use, useState, useRef, useEffect } from "react";
 import { notFound } from "next/navigation";
 import { motion } from "framer-motion";
 import { Search, Brain, Heart, Send } from "lucide-react";
@@ -38,11 +38,49 @@ export default function CompanionPage({ params }: { params: Promise<{ companion:
   const resolvedParams = use(params);
   const companionKey = resolvedParams.companion.toLowerCase() as CompanionKey;
   
+  const [messages, setMessages] = useState<{ role: 'user' | 'model'; content: string }[]>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isLoading]);
+
   if (!COMPANIONS[companionKey]) {
     notFound();
   }
 
   const ai = COMPANIONS[companionKey];
+
+  const sendMessage = async () => {
+    if (!input.trim() || isLoading) return;
+    const userMsg = input.trim();
+    setInput("");
+    setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
+    setIsLoading(true);
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userMessage: userMsg,
+          companionType: companionKey,
+        }),
+      });
+      const data = await res.json();
+      if (data.response) {
+        setMessages(prev => [...prev, { role: 'model', content: data.response }]);
+      } else if (data.error) {
+        setMessages(prev => [...prev, { role: 'model', content: `Error: ${data.error}` }]);
+      }
+    } catch (error) {
+      setMessages(prev => [...prev, { role: 'model', content: "Sorry, I couldn't connect to my brain right now." }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto h-full flex flex-col">
@@ -68,25 +106,60 @@ export default function CompanionPage({ params }: { params: Promise<{ companion:
             </div>
           </div>
 
-          {/* Phase 2 Mock Indicator */}
-          <div className="flex justify-center my-8">
-            <span className="text-xs font-medium px-3 py-1 rounded-full border border-glass-border text-text-muted">
-              Phase 3 Feature (Gemini Integration Pending)
-            </span>
-          </div>
+          {/* Chat Messages */}
+          {messages.map((msg, idx) => (
+            <div key={idx} className={`flex items-start gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+              {msg.role === 'model' && (
+                <div className="w-8 h-8 rounded-full bg-bg-tertiary flex items-center justify-center shrink-0 overflow-hidden" style={{ border: `1px solid ${ai.color}` }}>
+                  {ai.icon}
+                </div>
+              )}
+              <div className={`border border-glass-border p-4 max-w-[80%] whitespace-pre-wrap ${
+                msg.role === 'user' 
+                  ? 'bg-accent-active/10 text-text-primary rounded-2xl rounded-tr-sm' 
+                  : 'bg-bg-tertiary text-text-primary rounded-2xl rounded-tl-sm'
+              }`}>
+                {msg.content}
+              </div>
+            </div>
+          ))}
+
+          {isLoading && (
+            <div className="flex items-start gap-4">
+              <div className="w-8 h-8 rounded-full bg-bg-tertiary flex items-center justify-center shrink-0 overflow-hidden" style={{ border: `1px solid ${ai.color}` }}>
+                {ai.icon}
+              </div>
+              <div className="bg-bg-tertiary border border-glass-border rounded-2xl rounded-tl-sm p-4 text-text-muted max-w-[80%] flex items-center gap-1">
+                <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5 }} className="w-1.5 h-1.5 rounded-full bg-current" />
+                <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5, delay: 0.2 }} className="w-1.5 h-1.5 rounded-full bg-current" />
+                <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5, delay: 0.4 }} className="w-1.5 h-1.5 rounded-full bg-current" />
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
         </div>
 
         {/* Input Area */}
         <div className="p-4 border-t border-glass-border bg-bg-tertiary/50">
-          <div className="relative flex items-center">
+          <form 
+            onSubmit={(e) => { e.preventDefault(); sendMessage(); }}
+            className="relative flex items-center"
+          >
             <Input 
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
               placeholder={ai.placeholder} 
               className="pr-12 h-12 rounded-full bg-bg-secondary"
             />
-            <Button size="sm" className="absolute right-1.5 h-9 w-9 p-0 rounded-full flex items-center justify-center">
+            <Button 
+              type="submit"
+              disabled={isLoading || !input.trim()}
+              size="sm" 
+              className="absolute right-1.5 h-9 w-9 p-0 rounded-full flex items-center justify-center"
+            >
               <Send className="w-4 h-4" />
             </Button>
-          </div>
+          </form>
         </div>
       </Card>
     </div>
