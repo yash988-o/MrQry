@@ -13,6 +13,7 @@ export default function TimerSetup() {
   const [topic, setTopic] = useState("");
   const [focusMinutes, setFocusMinutes] = useState(25);
   const [breakMinutes, setBreakMinutes] = useState(5);
+  const [numBreaks, setNumBreaks] = useState(3);
   const [companion, setCompanion] = useState<GrowthCompanion>("plant");
 
   const companions: { type: GrowthCompanion; icon: any; label: string; color: string }[] = [
@@ -46,42 +47,61 @@ export default function TimerSetup() {
         </div>
 
         {/* Durations */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="flex items-center gap-2 text-sm font-medium text-text-secondary">
                 <Clock className="w-4 h-4 text-accent-violet" />
                 Focus Duration
               </label>
-              <span className="text-text-primary font-mono">{focusMinutes} min</span>
             </div>
-            <input
-              type="range"
-              min="5"
-              max="120"
-              step="5"
-              value={focusMinutes}
-              onChange={(e) => setFocusMinutes(Number(e.target.value))}
-              className="w-full accent-accent-violet"
-            />
+            <div className="relative">
+              <input
+                type="number"
+                min="5"
+                max="120"
+                value={focusMinutes}
+                onChange={(e) => setFocusMinutes(Number(e.target.value))}
+                className="w-full bg-bg-tertiary border border-glass-border rounded-xl px-4 py-2.5 text-text-primary focus:outline-none focus:border-accent-violet transition-colors"
+              />
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-text-muted">min</span>
+            </div>
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="flex items-center gap-2 text-sm font-medium text-text-secondary">
                 <Coffee className="w-4 h-4 text-accent-green" />
-                Break Duration
+                Break {numBreaks > 0 && <span className="text-accent-green">({numBreaks} times)</span>}
               </label>
-              <span className="text-text-primary font-mono">{breakMinutes} min</span>
+            </div>
+            <div className="relative">
+              <input
+                type="number"
+                min="1"
+                max="30"
+                value={breakMinutes}
+                onChange={(e) => setBreakMinutes(Number(e.target.value))}
+                className="w-full bg-bg-tertiary border border-glass-border rounded-xl px-4 py-2.5 text-text-primary focus:outline-none focus:border-accent-green transition-colors"
+              />
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-text-muted">min</span>
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="flex items-center gap-2 text-sm font-medium text-text-secondary">
+                <Clock className="w-4 h-4 text-accent-blue" />
+                Number of Breaks
+              </label>
             </div>
             <input
-              type="range"
-              min="1"
-              max="30"
-              step="1"
-              value={breakMinutes}
-              onChange={(e) => setBreakMinutes(Number(e.target.value))}
-              className="w-full accent-accent-green"
+              type="number"
+              min="0"
+              max="15"
+              value={numBreaks}
+              onChange={(e) => setNumBreaks(Number(e.target.value))}
+              className="w-full bg-bg-tertiary border border-glass-border rounded-xl px-4 py-2.5 text-text-primary focus:outline-none focus:border-accent-blue transition-colors"
             />
           </div>
         </div>
