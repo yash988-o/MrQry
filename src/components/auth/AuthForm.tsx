@@ -41,6 +41,7 @@ export default function AuthForm() {
           password,
           options: {
             data: { full_name: name },
+            emailRedirectTo: `${location.origin}/auth/callback?next=/dashboard`,
           },
         });
         if (signUpError) throw signUpError;
