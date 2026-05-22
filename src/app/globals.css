@@ -21,8 +21,8 @@
 
   --color-accent-active: var(--accent-active);
 
-  --font-display: var(--font-space-grotesk);
-  --font-body: var(--font-plus-jakarta-sans);
+  --font-display: var(--font-syne);
+  --font-body: var(--font-dm-sans);
   --font-mono: var(--font-jetbrains-mono);
 }
 
@@ -34,7 +34,7 @@
   --bg-overlay: #0D0E14;
 
   /* ── Text ── */
-  --text-primary: #F0F0F5;
+  --text-primary: #E2E2E6;
   --text-secondary: #9395A5;
   --text-muted: #4A4C5E;
 
@@ -56,7 +56,7 @@
   --glass-surface: rgba(255, 255, 255, 0.04);
   --glass-border: rgba(255, 255, 255, 0.07);
   --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
-  --shadow-glow-violet: 0 0 32px rgba(124, 106, 247, 0.3);
+  --shadow-glow-violet: 0 0 32px rgba(124, 106, 247, 0.4);
 
   /* ══ DYNAMIC ACCENT — ALL COMPONENTS USE THESE ══ */
   --accent-active: var(--accent-violet);
@@ -69,6 +69,24 @@ body {
   font-family: var(--font-body), sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Global restriction to prevent selecting, copying, or dragging text and images */
+* {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+
+/* Ensure input fields, textareas, and editable elements remain fully functional */
+input, textarea, [contenteditable="true"] {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
 }
 
 /* Base styles for scrollbar (optional but fits the dark theme) */

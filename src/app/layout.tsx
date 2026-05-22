@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
+import { Syne, DM_Sans, JetBrains_Mono } from "next/font/google";
+import { ThemeProvider } from "@/providers/ThemeProvider";
+import { ToastProvider } from "@/providers/ToastProvider";
 import "./globals.css";
 
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
+const syne = Syne({
+  variable: "--font-syne",
   subsets: ["latin"],
 });
 
-const plusJakartaSans = Plus_Jakarta_Sans({
-  variable: "--font-plus-jakarta-sans",
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
   subsets: ["latin"],
 });
 
@@ -18,17 +20,17 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MrQry | Improve Your Learning 10x",
+  title: "Mercury | Improve Your Learning 10x",
   description: "One place for every skill, every method, every dream. Built on the science of how your brain actually learns.",
   openGraph: {
-    title: "MrQry | Improve Your Learning 10x",
+    title: "Mercury | Improve Your Learning 10x",
     description: "The Scientific Learning Operating System.",
-    siteName: "MrQry",
+    siteName: "Mercury",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "MrQry | Improve Your Learning 10x",
+    title: "Mercury | Improve Your Learning 10x",
     description: "The Scientific Learning Operating System.",
   },
 };
@@ -39,13 +41,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${spaceGrotesk.variable} ${plusJakartaSans.variable} ${jetbrainsMono.variable} antialiased h-full`}
-    >
+      <html
+        lang="en"
+        className={`${syne.variable} ${dmSans.variable} ${jetbrainsMono.variable} antialiased h-full`}
+      >
       <body className="min-h-full flex flex-col bg-bg-primary text-text-primary">
-        {/* ThemeProvider and ToastProvider will wrap children here */}
-        {children}
+        <ThemeProvider>
+          <ToastProvider>
+            {children}
+          </ToastProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
