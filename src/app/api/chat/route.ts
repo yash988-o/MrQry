@@ -106,8 +106,16 @@ export async function POST(request: NextRequest) {
 
   } catch (error: any) {
     console.error("API Route Error:", error);
+    
+    if (error.message?.includes('429') || error.status === 429) {
+      return NextResponse.json(
+        { error: "I'm feeling a bit overwhelmed right now (Rate Limit Reached). Please give me a moment and try again later! If this persists, the API key quota may be exhausted." },
+        { status: 429 }
+      );
+    }
+
     return NextResponse.json(
-      { error: error.message || "An unexpected error occurred during content generation." }, 
+      { error: "I'm sorry, my brain is having trouble connecting right now. Please try again." }, 
       { status: 500 }
     );
   }
