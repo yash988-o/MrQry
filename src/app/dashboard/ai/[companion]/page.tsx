@@ -44,6 +44,7 @@ export default function CompanionPage({ params }: { params: Promise<{ companion:
   const [isLoading, setIsLoading] = useState(false);
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -88,6 +89,32 @@ export default function CompanionPage({ params }: { params: Promise<{ companion:
         };
         reader.readAsDataURL(file);
         break;
+      }
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const file = e.dataTransfer.files[0];
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          setImageBase64(event.target?.result as string);
+        };
+        reader.readAsDataURL(file);
       }
     }
   };
@@ -198,7 +225,14 @@ export default function CompanionPage({ params }: { params: Promise<{ companion:
         </div>
 
         {/* Input Area */}
-        <div className="p-4 border-t border-glass-border bg-bg-tertiary/50 flex flex-col gap-3">
+        <div 
+          className={`p-4 border-t border-glass-border flex flex-col gap-3 transition-colors ${
+            isDragging ? 'bg-accent-active/10 border-accent-active' : 'bg-bg-tertiary/50'
+          }`}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
           {imageBase64 && (
             <div className="relative w-24 h-24 rounded-lg overflow-hidden border border-glass-border group ml-2">
               <img src={imageBase64} alt="Preview" className="w-full h-full object-cover" />
