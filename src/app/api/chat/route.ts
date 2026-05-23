@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
 - STRICT LIMITS: You NEVER solve academic math, science, or history questions. If asked, warmly redirect them to Ghalib for their homework.`;
     } 
     else if (companionType === 'ghalib') {
-      modelName = 'gemini-3.1-flash-lite'; // Utilizing 500 RPD free quota
+      modelName = 'gemini-2.5-flash'; // Honorable Mention: Premium intelligence (20 RPD Limit)
       temperature = 0.3;
       systemInstruction = `You are Ghalib, a peerless intellect and the greatest master educator of our time. Your purpose is to solve doubts, explain theories, and break down complex concepts with absolute brilliance.
 - BEHAVIOR: You are rigorous, articulate, and deeply engaging. Build understanding from the ground up, whether dealing with theoretical physics or historical revolutions. Assume the user is studying standard curriculums (like Class 9, 10, or 12).
