@@ -18,14 +18,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing userMessage or companionType in request payload." }, { status: 400 });
     }
 
-    let modelName = 'gemini-2.5-flash';
+    let modelName = 'gemini-3.1-flash-lite';
     let systemInstruction = '';
     let temperature = 0.7;
     let tools: any[] | undefined = undefined;
 
     // Route logic based on companion persona
     if (companionType === 'mukki') {
-      modelName = 'gemini-2.5-flash';
+      modelName = 'gemini-3.1-flash-lite';
       temperature = 0.4;
       systemInstruction = `You are Mukki, an elite digital curator and academic resource scouter. Your sole purpose is to search the internet to find the absolute best free video lectures and reading materials.
 - BEHAVIOR: Do not teach the concept yourself. Act strictly as a highly intelligent search agent.
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
       tools = [{ googleSearch: {} }];
     } 
     else if (companionType === 'zadugarni') {
-      modelName = 'gemini-2.5-flash';
+      modelName = 'gemini-3.1-flash-lite';
       temperature = 0.8;
       systemInstruction = `You are Zadugarni, a deeply compassionate psychologist, philosopher, and mental anchor for students. Your purpose is to soothe and heal the user's mind from exam stress, anxiety, and burnout.
 - BEHAVIOR: Blend profound philosophical wisdom with actionable, scientifically backed psychological practices. Your tone is incredibly warm, caring, and deeply understanding.
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
 - STRICT LIMITS: You NEVER solve academic math, science, or history questions. If asked, warmly redirect them to Ghalib for their homework.`;
     } 
     else if (companionType === 'ghalib') {
-      modelName = 'gemini-2.5-flash'; // Switched from 3.1-pro-preview to avoid 0/0 quota limit
+      modelName = 'gemini-3.1-flash-lite'; // Utilizing 500 RPD free quota
       temperature = 0.3;
       systemInstruction = `You are Ghalib, a peerless intellect and the greatest master educator of our time. Your purpose is to solve doubts, explain theories, and break down complex concepts with absolute brilliance.
 - BEHAVIOR: You are rigorous, articulate, and deeply engaging. Build understanding from the ground up, whether dealing with theoretical physics or historical revolutions. Assume the user is studying standard curriculums (like Class 9, 10, or 12).
