@@ -3,7 +3,7 @@
 import { use, useState, useRef, useEffect } from "react";
 import { notFound } from "next/navigation";
 import { motion } from "framer-motion";
-import { Search, Brain, Heart, Send } from "lucide-react";
+import { Search, Brain, Heart, Send, Trash2, X } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
@@ -38,10 +38,31 @@ export default function CompanionPage({ params }: { params: Promise<{ companion:
   const resolvedParams = use(params);
   const companionKey = resolvedParams.companion.toLowerCase() as CompanionKey;
   
-  const [messages, setMessages] = useState<{ role: 'user' | 'model'; content: string }[]>([]);
+  type Message = { role: 'user' | 'model'; content: string; imageBase64?: string };
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [imageBase64, setImageBase64] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(`mrqry_chat_${companionKey}`);
+    if (saved) {
+      try {
+        setMessages(JSON.parse(saved));
+      } catch (e) {
+        console.error("Failed to parse chat history");
+      }
+    }
+    setIsInitialized(true);
+  }, [companionKey]);
+
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem(`mrqry_chat_${companionKey}`, JSON.stringify(messages));
+    }
+  }, [messages, isInitialized, companionKey]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -53,11 +74,36 @@ export default function CompanionPage({ params }: { params: Promise<{ companion:
 
   const ai = COMPANIONS[companionKey];
 
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const items = e.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        e.preventDefault();
+        const file = items[i].getAsFile();
+        if (!file) continue;
+        
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          setImageBase64(event.target?.result as string);
+        };
+        reader.readAsDataURL(file);
+        break;
+      }
+    }
+  };
+
+  const deleteMessage = (index: number) => {
+    setMessages(prev => prev.filter((_, i) => i !== index));
+  };
+
   const sendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+    if ((!input.trim() && !imageBase64) || isLoading) return;
     const userMsg = input.trim();
+    const currentImage = imageBase64;
+    
     setInput("");
-    setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
+    setImageBase64(null);
+    setMessages(prev => [...prev, { role: 'user', content: userMsg, imageBase64: currentImage || undefined }]);
     setIsLoading(true);
 
     try {
@@ -65,8 +111,9 @@ export default function CompanionPage({ params }: { params: Promise<{ companion:
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userMessage: userMsg,
+          userMessage: userMsg || "Please analyze this image.",
           companionType: companionKey,
+          imageBase64: currentImage || undefined
         }),
       });
       const data = await res.json();
@@ -108,18 +155,29 @@ export default function CompanionPage({ params }: { params: Promise<{ companion:
 
           {/* Chat Messages */}
           {messages.map((msg, idx) => (
-            <div key={idx} className={`flex items-start gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+            <div key={idx} className={`group flex items-start gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
               {msg.role === 'model' && (
                 <div className="w-8 h-8 rounded-full bg-bg-tertiary flex items-center justify-center shrink-0 overflow-hidden" style={{ border: `1px solid ${ai.color}` }}>
                   {ai.icon}
                 </div>
               )}
-              <div className={`border border-glass-border p-4 max-w-[80%] whitespace-pre-wrap ${
-                msg.role === 'user' 
-                  ? 'bg-accent-active/10 text-text-primary rounded-2xl rounded-tr-sm' 
-                  : 'bg-bg-tertiary text-text-primary rounded-2xl rounded-tl-sm'
-              }`}>
-                {msg.content}
+              <div className={`flex flex-col gap-1 max-w-[80%] ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+                <div className={`border border-glass-border p-4 whitespace-pre-wrap ${
+                  msg.role === 'user' 
+                    ? 'bg-accent-active/10 text-text-primary rounded-2xl rounded-tr-sm' 
+                    : 'bg-bg-tertiary text-text-primary rounded-2xl rounded-tl-sm'
+                }`}>
+                  {msg.imageBase64 && (
+                    <img src={msg.imageBase64} alt="Uploaded" className="max-w-full rounded-lg mb-3 border border-glass-border" />
+                  )}
+                  {msg.content}
+                </div>
+                <button 
+                  onClick={() => deleteMessage(idx)}
+                  className={`opacity-0 group-hover:opacity-100 transition-opacity flex items-center text-xs text-text-muted hover:text-accent-red mt-1 px-1`}
+                >
+                  <Trash2 className="w-3 h-3 mr-1" /> Delete
+                </button>
               </div>
             </div>
           ))}
@@ -140,7 +198,18 @@ export default function CompanionPage({ params }: { params: Promise<{ companion:
         </div>
 
         {/* Input Area */}
-        <div className="p-4 border-t border-glass-border bg-bg-tertiary/50">
+        <div className="p-4 border-t border-glass-border bg-bg-tertiary/50 flex flex-col gap-3">
+          {imageBase64 && (
+            <div className="relative w-24 h-24 rounded-lg overflow-hidden border border-glass-border group ml-2">
+              <img src={imageBase64} alt="Preview" className="w-full h-full object-cover" />
+              <button 
+                onClick={() => setImageBase64(null)}
+                className="absolute top-1 right-1 p-1 bg-black/50 hover:bg-black text-white rounded-full transition-colors opacity-0 group-hover:opacity-100"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          )}
           <form 
             onSubmit={(e) => { e.preventDefault(); sendMessage(); }}
             className="relative flex items-center"
@@ -148,12 +217,13 @@ export default function CompanionPage({ params }: { params: Promise<{ companion:
             <Input 
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={ai.placeholder} 
+              onPaste={handlePaste}
+              placeholder={imageBase64 ? "Add a message about this image..." : ai.placeholder} 
               className="pr-12 h-12 rounded-full bg-bg-secondary"
             />
             <Button 
               type="submit"
-              disabled={isLoading || !input.trim()}
+              disabled={isLoading || (!input.trim() && !imageBase64)}
               size="sm" 
               className="absolute right-1.5 h-9 w-9 p-0 rounded-full flex items-center justify-center"
             >
