@@ -7,6 +7,7 @@ import { Search, Brain, Heart, Send, Trash2, X } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
+import { useToast } from "@/providers/ToastProvider";
 
 type CompanionKey = "mukki" | "ghalib" | "zadugarni";
 
@@ -41,6 +42,7 @@ export default function CompanionPage({ params }: { params: Promise<{ companion:
   type Message = { role: 'user' | 'model'; content: string; imageBase64?: string };
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -115,6 +117,8 @@ export default function CompanionPage({ params }: { params: Promise<{ companion:
           setImageBase64(event.target?.result as string);
         };
         reader.readAsDataURL(file);
+      } else {
+        toast({ title: "Only image files are supported.", type: "error" });
       }
     }
   };
