@@ -12,6 +12,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           "w-full bg-bg-tertiary border border-glass-border rounded-xl px-4 py-2 text-text-primary placeholder:text-text-muted",
           "focus:outline-none focus:ring-2 focus:ring-accent-active focus:border-transparent transition-all",
           "disabled:opacity-50 disabled:cursor-not-allowed",
+          "[color-scheme:dark]",
           className
         )}
         {...props}

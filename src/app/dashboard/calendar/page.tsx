@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, BrainCircuit } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
@@ -17,6 +17,21 @@ const mockRevisions: Record<number, { count: number; subjects: string[] }> = {
 
 export default function CalendarPage() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<number>(new Date().getDate());
+  const [personalNotes, setPersonalNotes] = useState("");
+  const [isNotesLoaded, setIsNotesLoaded] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("mrqry_personal_notes");
+    if (saved) setPersonalNotes(saved);
+    setIsNotesLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (isNotesLoaded) {
+      localStorage.setItem("mrqry_personal_notes", personalNotes);
+    }
+  }, [personalNotes, isNotesLoaded]);
 
   const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
   const firstDayOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay();
@@ -75,13 +90,18 @@ export default function CalendarPage() {
                 const isToday = day === new Date().getDate() && currentMonth.getMonth() === new Date().getMonth();
 
                 return (
-                  <div
+                  <button
                     key={day}
-                    className={`h-24 rounded-xl border p-2 flex flex-col transition-colors ${
-                      isToday ? 'border-accent-active bg-accent-active/5' : 'border-glass-border bg-bg-tertiary hover:border-text-muted'
+                    onClick={() => setSelectedDate(day)}
+                    className={`h-24 rounded-xl border p-2 flex flex-col items-start transition-colors w-full text-left ${
+                      day === selectedDate 
+                        ? 'border-accent-active bg-accent-active/10 shadow-shadow-glow-violet' 
+                        : isToday 
+                          ? 'border-accent-active/50 bg-accent-active/5' 
+                          : 'border-glass-border bg-bg-tertiary hover:border-text-muted'
                     }`}
                   >
-                    <span className={`text-sm font-medium ${isToday ? 'text-accent-active' : 'text-text-secondary'}`}>
+                    <span className={`text-sm font-medium ${day === selectedDate || isToday ? 'text-accent-active' : 'text-text-secondary'}`}>
                       {day}
                     </span>
                     {revision && (
@@ -94,7 +114,7 @@ export default function CalendarPage() {
                         <span className="text-[10px] text-text-muted font-medium">{revision.count} items</span>
                       </div>
                     )}
-                  </div>
+                  </button>
                 );
               })}
             </div>
@@ -117,22 +137,33 @@ export default function CalendarPage() {
           </Card>
 
           <Card className="p-6">
-            <h3 className="font-medium text-text-primary mb-4">Upcoming Reviews</h3>
+            <h3 className="font-medium text-text-primary mb-4">
+              Reviews for {currentMonth.toLocaleString('default', { month: 'short' })} {selectedDate}
+            </h3>
             <div className="space-y-4">
-              {[
-                { date: "Tomorrow", subject: "Math", items: 3 },
-                { date: "Oct 25", subject: "Spanish", items: 12 },
-                { date: "Oct 28", subject: "History", items: 8 },
-              ].map((item, idx) => (
-                <div key={idx} className="flex items-center justify-between py-2 border-b border-glass-border last:border-0">
-                  <div>
-                    <p className="text-sm font-medium text-text-primary">{item.subject}</p>
-                    <p className="text-xs text-text-muted">{item.date}</p>
+              {mockRevisions[selectedDate] ? (
+                mockRevisions[selectedDate].subjects.map((sub, idx) => (
+                  <div key={idx} className="flex items-center justify-between py-2 border-b border-glass-border last:border-0">
+                    <div>
+                      <p className="text-sm font-medium text-text-primary">{sub}</p>
+                    </div>
+                    <Badge variant="default">Due</Badge>
                   </div>
-                  <Badge variant="default">{item.items} items</Badge>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="text-sm text-text-muted">No reviews scheduled for this day. You are free!</p>
+              )}
             </div>
+          </Card>
+
+          <Card className="p-6 border-glass-border">
+            <h3 className="font-medium text-text-primary mb-3">Personal Notes & Reminders</h3>
+            <textarea
+              value={personalNotes}
+              onChange={(e) => setPersonalNotes(e.target.value)}
+              placeholder="Jot down important dates, thoughts, or custom reminders here... (Auto-saves)"
+              className="w-full h-32 bg-bg-tertiary border border-glass-border rounded-xl p-3 text-sm text-text-primary focus:outline-none focus:border-accent-violet transition-colors resize-none placeholder:text-text-muted/50"
+            />
           </Card>
         </div>
       </div>

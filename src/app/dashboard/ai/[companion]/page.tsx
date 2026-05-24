@@ -158,14 +158,31 @@ export default function CompanionPage({ params }: { params: Promise<{ companion:
 
   return (
     <div className="max-w-4xl mx-auto h-full flex flex-col">
-      <div className="flex items-center gap-4 mb-8">
-        <div className="w-12 h-12 rounded-xl bg-bg-secondary border border-glass-border shadow-shadow-card flex items-center justify-center overflow-hidden shrink-0" style={{ borderColor: ai.color, boxShadow: `0 0 20px ${ai.color}20` }}>
-          {ai.icon}
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-bg-secondary border border-glass-border shadow-shadow-card flex items-center justify-center overflow-hidden shrink-0" style={{ borderColor: ai.color, boxShadow: `0 0 20px ${ai.color}20` }}>
+            {ai.icon}
+          </div>
+          <div>
+            <h1 className="text-2xl font-display font-bold" style={{ color: ai.color }}>{ai.name}</h1>
+            <p className="text-text-secondary text-sm">Your AI Companion</p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-2xl font-display font-bold" style={{ color: ai.color }}>{ai.name}</h1>
-          <p className="text-text-secondary text-sm">Your AI Companion</p>
-        </div>
+        
+        <Button 
+          variant="secondary" 
+          size="sm" 
+          onClick={() => {
+            if (confirm("Are you sure you want to completely clear this conversation?")) {
+              setMessages([]);
+              localStorage.removeItem(`mrqry_chat_${companionKey}`);
+            }
+          }}
+          className="text-text-muted hover:text-accent-red hover:bg-accent-red/10 border-glass-border bg-bg-tertiary"
+        >
+          <Trash2 className="w-4 h-4 mr-2" />
+          Clear Chat
+        </Button>
       </div>
 
       <Card className="flex-1 flex flex-col p-0 overflow-hidden mb-6 border-glass-border" style={{ boxShadow: `0 4px 24px ${ai.color}10` }}>

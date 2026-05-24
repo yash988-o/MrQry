@@ -63,7 +63,15 @@ export default function TaskItem({ task, onToggle, onDelete }: TaskItemProps) {
             {task.title}
           </span>
           <div className="flex items-center gap-3 mt-1">
-            <Badge variant={priorityColors[task.priority]}>{task.priority}</Badge>
+            <div className="group/tooltip relative flex items-center">
+              <Badge variant={priorityColors[task.priority]}>{task.priority}</Badge>
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-xs bg-bg-primary border border-glass-border shadow-shadow-glow-violet text-text-primary text-xs font-medium rounded-lg px-3 py-2 opacity-0 pointer-events-none group-hover/tooltip:opacity-100 transition-opacity z-50">
+                {task.priority === "high" && "High Priority: Complete immediately to stay on track."}
+                {task.priority === "medium" && "Medium Priority: Should be completed soon."}
+                {task.priority === "low" && "Low Priority: Complete when you have extra time."}
+                {task.priority === "core" && "Core Task: Fundamental to your long-term goals."}
+              </div>
+            </div>
             {task.estimatedMinutes && (
               <div className="flex items-center gap-1 text-xs text-text-muted">
                 <Clock className="w-3 h-3" />

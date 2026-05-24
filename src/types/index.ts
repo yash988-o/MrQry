@@ -74,6 +74,7 @@ export interface TimerSession {
   topic: string;
   durationMinutes: number;
   breakIntervalMinutes: number;
+  numBreaks?: number;
   growthCompanion: GrowthCompanion;
   idleGracePeriodSeconds: number;
   startedAt: string;

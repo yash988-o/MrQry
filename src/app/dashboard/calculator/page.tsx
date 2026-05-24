@@ -108,7 +108,7 @@ export default function CalculatorPage() {
               selectedValue={angleMode} 
               onChange={(val) => setAngleMode(val as "deg" | "rad")} 
             />
-            <button onClick={() => setHistory([])} className="text-xs text-text-muted hover:text-text-primary transition-colors">
+            <button onClick={() => setHistory([])} className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors">
               Clear History
             </button>
           </div>

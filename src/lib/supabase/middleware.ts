@@ -31,7 +31,11 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user && request.nextUrl.pathname.startsWith("/dashboard")) {
+  // Temporary bypass for local development testing
+  const isLocalhost = request.nextUrl.hostname === 'localhost';
+  const allowBypass = isLocalhost && process.env.NODE_ENV === 'development';
+
+  if (!user && !allowBypass && request.nextUrl.pathname.startsWith("/dashboard")) {
     const url = request.nextUrl.clone();
     url.pathname = "/auth";
     url.searchParams.set("mode", "signin");

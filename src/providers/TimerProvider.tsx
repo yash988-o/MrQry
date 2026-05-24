@@ -5,7 +5,7 @@ import { TimerSession, GrowthCompanion } from "@/types";
 
 type TimerContextType = {
   session: TimerSession | null;
-  startSession: (topic: string, durationMinutes: number, breakMinutes: number, companion: GrowthCompanion) => void;
+  startSession: (topic: string, durationMinutes: number, breakMinutes: number, companion: GrowthCompanion, numBreaks?: number) => void;
   pauseSession: () => void;
   resumeSession: () => void;
   endSession: () => void;
@@ -50,12 +50,13 @@ export function TimerProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(interval);
   }, [session?.isActive, session?.isPaused]);
 
-  const startSession = (topic: string, durationMinutes: number, breakMinutes: number, companion: GrowthCompanion) => {
+  const startSession = (topic: string, durationMinutes: number, breakMinutes: number, companion: GrowthCompanion, numBreaks: number = 3) => {
     setSession({
       id: Math.random().toString(36).substring(2, 9),
       topic,
       durationMinutes,
       breakIntervalMinutes: breakMinutes,
+      numBreaks,
       growthCompanion: companion,
       idleGracePeriodSeconds: 300,
       startedAt: new Date().toISOString(),

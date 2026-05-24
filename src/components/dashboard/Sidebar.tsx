@@ -42,8 +42,9 @@ export default function Sidebar() {
   return (
     <aside className="w-64 border-r border-glass-border bg-bg-secondary flex flex-col h-full shrink-0">
       <div className="p-6 border-b border-glass-border">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <img src="/logo.png" alt="Logo" className="h-10 w-auto object-contain" />
+        <Link href="/dashboard" className="flex items-center gap-3">
+          <img src="/logo.png" alt="Logo" className="h-8 w-auto object-contain shrink-0" />
+          <span className="text-xl font-display font-bold text-text-primary tracking-wide">MrQry</span>
         </Link>
       </div>
 
