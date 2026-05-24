@@ -6,38 +6,53 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 
-// Mock data for revisions
-const mockRevisions: Record<number, { count: number; subjects: string[] }> = {
-  12: { count: 3, subjects: ["Math", "Physics"] },
-  15: { count: 1, subjects: ["Spanish"] },
-  18: { count: 5, subjects: ["History", "Biology"] },
-  22: { count: 2, subjects: ["CS"] },
-  25: { count: 4, subjects: ["Math", "Literature"] },
-};
+// Mock data generator for month-aware revisions
+const getMockRevisions = (year: number, month: number): Record<string, { count: number; subjects: string[] }> => ({
+  [`${year}-${month}-12`]: { count: 3, subjects: ["Math", "Physics"] },
+  [`${year}-${month}-15`]: { count: 1, subjects: ["Spanish"] },
+  [`${year}-${month}-18`]: { count: 5, subjects: ["History", "Biology"] },
+  [`${year}-${month}-22`]: { count: 2, subjects: ["CS"] },
+  [`${year}-${month}-25`]: { count: 4, subjects: ["Math", "Literature"] },
+});
 
 export default function CalendarPage() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<number>(new Date().getDate());
+  const [notesDict, setNotesDict] = useState<Record<string, string>>({});
   const [personalNotes, setPersonalNotes] = useState("");
   const [isNotesLoaded, setIsNotesLoaded] = useState(false);
 
+  const selectedDateKey = `${currentMonth.getFullYear()}-${currentMonth.getMonth() + 1}-${selectedDate}`;
+
   useEffect(() => {
-    const saved = localStorage.getItem("mrqry_personal_notes");
-    if (saved) setPersonalNotes(saved);
+    const saved = localStorage.getItem("mrqry_personal_notes_v2");
+    if (saved) {
+      try {
+        setNotesDict(JSON.parse(saved));
+      } catch (e) {}
+    }
     setIsNotesLoaded(true);
   }, []);
 
   useEffect(() => {
     if (isNotesLoaded) {
-      localStorage.setItem("mrqry_personal_notes", personalNotes);
+      setPersonalNotes(notesDict[selectedDateKey] || "");
     }
-  }, [personalNotes, isNotesLoaded]);
+  }, [selectedDateKey, isNotesLoaded]);
+
+  const handleSaveNote = () => {
+    const newDict = { ...notesDict, [selectedDateKey]: personalNotes };
+    setNotesDict(newDict);
+    localStorage.setItem("mrqry_personal_notes_v2", JSON.stringify(newDict));
+  };
 
   const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
   const firstDayOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay();
 
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
   const padding = Array.from({ length: firstDayOfMonth }, (_, i) => i);
+  
+  const currentMockRevisions = getMockRevisions(currentMonth.getFullYear(), currentMonth.getMonth() + 1);
 
   const prevMonth = () => {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
@@ -86,7 +101,8 @@ export default function CalendarPage() {
                 <div key={`pad-${i}`} className="h-24 rounded-xl bg-transparent" />
               ))}
               {days.map(day => {
-                const revision = mockRevisions[day];
+                const dateKey = `${currentMonth.getFullYear()}-${currentMonth.getMonth() + 1}-${day}`;
+                const revision = currentMockRevisions[dateKey];
                 const isToday = day === new Date().getDate() && currentMonth.getMonth() === new Date().getMonth();
 
                 return (
@@ -141,8 +157,8 @@ export default function CalendarPage() {
               Reviews for {currentMonth.toLocaleString('default', { month: 'short' })} {selectedDate}
             </h3>
             <div className="space-y-4">
-              {mockRevisions[selectedDate] ? (
-                mockRevisions[selectedDate].subjects.map((sub, idx) => (
+              {currentMockRevisions[selectedDateKey] ? (
+                currentMockRevisions[selectedDateKey].subjects.map((sub, idx) => (
                   <div key={idx} className="flex items-center justify-between py-2 border-b border-glass-border last:border-0">
                     <div>
                       <p className="text-sm font-medium text-text-primary">{sub}</p>
@@ -157,13 +173,20 @@ export default function CalendarPage() {
           </Card>
 
           <Card className="p-6 border-glass-border">
-            <h3 className="font-medium text-text-primary mb-3">Personal Notes & Reminders</h3>
-            <textarea
-              value={personalNotes}
-              onChange={(e) => setPersonalNotes(e.target.value)}
-              placeholder="Jot down important dates, thoughts, or custom reminders here... (Auto-saves)"
-              className="w-full h-32 bg-bg-tertiary border border-glass-border rounded-xl p-3 text-sm text-text-primary focus:outline-none focus:border-accent-violet transition-colors resize-none placeholder:text-text-muted/50"
-            />
+            <h3 className="font-medium text-text-primary mb-3">Notes for {currentMonth.toLocaleString('default', { month: 'short' })} {selectedDate}</h3>
+            <div className="flex flex-col gap-3">
+              <textarea
+                value={personalNotes}
+                onChange={(e) => setPersonalNotes(e.target.value)}
+                placeholder="Jot down important dates, thoughts, or custom reminders here..."
+                className="w-full h-32 bg-bg-tertiary border border-glass-border rounded-xl p-3 text-sm text-text-primary focus:outline-none focus:border-accent-violet transition-colors resize-none placeholder:text-text-muted/50"
+              />
+              <div className="flex justify-end">
+                <Button onClick={handleSaveNote} size="sm">
+                  Save Note
+                </Button>
+              </div>
+            </div>
           </Card>
         </div>
       </div>

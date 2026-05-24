@@ -11,9 +11,9 @@ export default function TimerSetup() {
   const { startSession } = useTimer();
   
   const [topic, setTopic] = useState("");
-  const [focusMinutes, setFocusMinutes] = useState(25);
-  const [breakMinutes, setBreakMinutes] = useState(5);
-  const [numBreaks, setNumBreaks] = useState(3);
+  const [focusMinutes, setFocusMinutes] = useState<string | number>(25);
+  const [breakMinutes, setBreakMinutes] = useState<string | number>(5);
+  const [numBreaks, setNumBreaks] = useState<string | number>(3);
   const [companion, setCompanion] = useState<GrowthCompanion>("plant");
 
   const companions: { type: GrowthCompanion; icon: any; label: string; color: string }[] = [
@@ -24,7 +24,7 @@ export default function TimerSetup() {
   ];
 
   const handleStart = () => {
-    startSession(topic || "Deep Focus", focusMinutes, breakMinutes, companion, numBreaks);
+    startSession(topic || "Deep Focus", Number(focusMinutes) || 25, Number(breakMinutes) || 5, companion, Number(numBreaks) || 3);
   };
 
   return (
@@ -61,7 +61,7 @@ export default function TimerSetup() {
                 min="5"
                 max="120"
                 value={focusMinutes}
-                onChange={(e) => setFocusMinutes(Number(e.target.value))}
+                onChange={(e) => setFocusMinutes(e.target.value === "" ? "" : Number(e.target.value))}
                 className="w-full bg-bg-tertiary border border-glass-border rounded-xl px-4 py-2.5 text-text-primary focus:outline-none focus:border-accent-violet transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-text-muted">min</span>
@@ -81,7 +81,7 @@ export default function TimerSetup() {
                 min="1"
                 max="30"
                 value={breakMinutes}
-                onChange={(e) => setBreakMinutes(Number(e.target.value))}
+                onChange={(e) => setBreakMinutes(e.target.value === "" ? "" : Number(e.target.value))}
                 className="w-full bg-bg-tertiary border border-glass-border rounded-xl px-4 py-2.5 text-text-primary focus:outline-none focus:border-accent-green transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-text-muted">min</span>
@@ -100,7 +100,7 @@ export default function TimerSetup() {
               min="0"
               max="15"
               value={numBreaks}
-              onChange={(e) => setNumBreaks(Number(e.target.value))}
+              onChange={(e) => setNumBreaks(e.target.value === "" ? "" : Number(e.target.value))}
               className="w-full bg-bg-tertiary border border-glass-border rounded-xl px-4 py-2.5 text-text-primary focus:outline-none focus:border-accent-blue transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
           </div>
