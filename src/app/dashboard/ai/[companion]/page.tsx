@@ -260,51 +260,45 @@ export default function CompanionPage({ params }: { params: Promise<{ companion:
     <div className="flex h-[calc(100vh-4rem)] -m-6 sm:-m-8">
       {/* Main Chat Area (Full Screen minus sidebars) */}
       <div className="flex-1 flex flex-col min-w-0 bg-bg-primary">
-        {/* Chat Header */}
-        <div className="h-16 flex items-center px-6 border-b border-glass-border bg-bg-primary/80 backdrop-blur-sm z-10 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: `${ai.color}20`, color: ai.color }}>
-              <Brain className="w-4 h-4" />
-            </div>
-            <h2 className="font-medium text-text-primary">{ai.name}</h2>
-          </div>
-        </div>
+
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-8">
-          <div className="max-w-3xl mx-auto space-y-6">
+          <div className="max-w-4xl mx-auto space-y-6">
             {/* AI Greeting Message */}
             <div className="flex items-start gap-4">
               <div className="w-8 h-8 rounded-full bg-bg-tertiary flex items-center justify-center shrink-0 overflow-hidden" style={{ border: `1px solid ${ai.color}` }}>
                 {ai.icon}
               </div>
-              <div className="bg-bg-tertiary border border-glass-border rounded-2xl rounded-tl-sm p-4 text-text-primary max-w-[80%] shadow-sm">
-                {ai.greeting}
+              <div className="flex flex-col gap-1 w-full max-w-full">
+                <div className="whitespace-pre-wrap text-text-primary mt-1">
+                  {ai.greeting}
+                </div>
               </div>
             </div>
 
             {/* Chat Messages */}
             {messages.map((msg, idx) => (
-              <div key={idx} className={`group flex items-start gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                {msg.role === 'model' && (
+              <div key={idx} className="group flex items-start gap-4">
+                {msg.role === 'model' ? (
                   <div className="w-8 h-8 rounded-full bg-bg-tertiary flex items-center justify-center shrink-0 overflow-hidden" style={{ border: `1px solid ${ai.color}` }}>
                     {ai.icon}
                   </div>
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-bg-tertiary border border-glass-border flex items-center justify-center shrink-0 overflow-hidden text-xs font-medium text-text-secondary">
+                    YJ
+                  </div>
                 )}
-                <div className={`flex flex-col gap-1 max-w-[85%] sm:max-w-[75%] ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-                  <div className={`border border-glass-border p-4 whitespace-pre-wrap shadow-sm ${
-                    msg.role === 'user' 
-                      ? 'bg-accent-active/10 text-text-primary rounded-2xl rounded-tr-sm' 
-                      : 'bg-bg-tertiary text-text-primary rounded-2xl rounded-tl-sm'
-                  }`}>
+                <div className="flex flex-col gap-1 w-full max-w-full">
+                  <div className="whitespace-pre-wrap text-text-primary mt-1">
                     {msg.imageBase64 && (
-                      <img src={msg.imageBase64} alt="Uploaded" className="max-w-full rounded-lg mb-3 border border-glass-border shadow-sm" />
+                      <img src={msg.imageBase64} alt="Uploaded" className="max-w-md rounded-lg mb-3 border border-glass-border shadow-sm" />
                     )}
                     {msg.content}
                   </div>
                   <button 
                     onClick={() => deleteMessage(idx)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center text-xs text-text-muted hover:text-accent-red mt-1 px-1"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center text-xs text-text-muted hover:text-accent-red mt-2"
                   >
                     <Trash2 className="w-3 h-3 mr-1" /> Delete
                   </button>
@@ -317,10 +311,12 @@ export default function CompanionPage({ params }: { params: Promise<{ companion:
                 <div className="w-8 h-8 rounded-full bg-bg-tertiary flex items-center justify-center shrink-0 overflow-hidden" style={{ border: `1px solid ${ai.color}` }}>
                   {ai.icon}
                 </div>
-                <div className="bg-bg-tertiary border border-glass-border rounded-2xl rounded-tl-sm p-4 text-text-muted max-w-[80%] flex items-center gap-1 shadow-sm">
-                  <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5 }} className="w-1.5 h-1.5 rounded-full bg-current" />
-                  <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5, delay: 0.2 }} className="w-1.5 h-1.5 rounded-full bg-current" />
-                  <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5, delay: 0.4 }} className="w-1.5 h-1.5 rounded-full bg-current" />
+                <div className="flex flex-col gap-1 w-full max-w-full">
+                  <div className="whitespace-pre-wrap text-text-muted mt-1 flex items-center gap-1">
+                    <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5 }} className="w-1.5 h-1.5 rounded-full bg-current" />
+                    <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5, delay: 0.2 }} className="w-1.5 h-1.5 rounded-full bg-current" />
+                    <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5, delay: 0.4 }} className="w-1.5 h-1.5 rounded-full bg-current" />
+                  </div>
                 </div>
               </div>
             )}
@@ -330,7 +326,7 @@ export default function CompanionPage({ params }: { params: Promise<{ companion:
 
         {/* Input Area */}
         <div className="p-4 sm:p-6 bg-gradient-to-t from-bg-primary via-bg-primary to-transparent shrink-0">
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-4xl mx-auto">
             <div 
               className={`relative flex flex-col gap-3 rounded-2xl border transition-all shadow-shadow-card ${
                 isDragging ? 'bg-accent-active/10 border-accent-active' : 'bg-bg-tertiary border-glass-border focus-within:border-accent-active/50'
