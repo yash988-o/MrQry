@@ -125,7 +125,7 @@ export default function CalculatorPage() {
                 {renderButton("cos⁻¹", () => handleInput("acos("), "ghost")}
                 {renderButton("tan⁻¹", () => handleInput("atan("), "ghost")}
                 {renderButton("ln", () => handleInput("ln("), "ghost")}
-                {renderButton("log", () => handleInput("log("), "ghost")}
+                {renderButton("log", () => handleInput("log10("), "ghost")}
                 {renderButton("√", () => handleInput("sqrt("), "ghost")}
                 {renderButton("|x|", () => handleInput("abs("), "ghost")}
                 {renderButton("^", () => handleInput("^"), "ghost")}
