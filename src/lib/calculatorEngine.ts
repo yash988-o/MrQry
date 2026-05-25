@@ -10,7 +10,11 @@ export function safeEvaluate(expr: string, angleMode: "deg" | "rad" = "deg"): nu
       .replace(/−/g, '-')
       .replace(/π/g, 'pi')
       .replace(/ln\(/g, 'log(') // mathjs log(x) is natural log by default.
-      .replace(/log10\(/g, 'log10(');
+      .replace(/log10\(/g, 'log10(')
+      // Implicit multiplication replacements
+      .replace(/(\d+)\(/g, '$1*(')
+      .replace(/\)(\d+)/g, ')*$1')
+      .replace(/\)\(/g, ')*(');
 
     // If angle mode is degrees, we create a scope with wrapped trigonometric functions
     // so that inputs are automatically converted to radians (which mathjs expects).

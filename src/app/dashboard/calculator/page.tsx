@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+import { Trash2 } from "lucide-react";
 import { safeEvaluate } from "@/lib/calculatorEngine";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import SegmentedControl from "@/components/ui/SegmentedControl";
@@ -12,7 +14,7 @@ export default function CalculatorPage() {
   const [result, setResult] = useState("");
   const [mode, setMode] = useState("scientific");
   const [angleMode, setAngleMode] = useState<"deg" | "rad">("deg");
-  const [history, setHistory] = useState<{expr: string, res: string}[]>([]);
+  const [history, setHistory] = useLocalStorage<{expr: string, res: string}[]>("mrqry_calc_history", []);
 
   // Auto-scroll history to bottom
   const historyRef = useRef<HTMLDivElement>(null);
@@ -91,9 +93,13 @@ export default function CalculatorPage() {
           
           {/* Display */}
           <div className="bg-bg-tertiary border border-glass-border rounded-2xl p-6 mb-6 flex flex-col items-end justify-end min-h-[140px]">
-            <div className="text-text-secondary font-mono text-xl tracking-wider mb-2 h-7 break-all text-right">
-              {expression}
-            </div>
+            <input 
+              type="text"
+              value={expression}
+              onChange={(e) => { setExpression(e.target.value); setResult(""); }}
+              className="text-text-secondary font-mono text-xl tracking-wider mb-2 h-7 bg-transparent border-none outline-none text-right w-full focus:ring-0 placeholder:text-transparent"
+              placeholder="0"
+            />
             <div className={`font-display font-bold text-5xl tracking-tight truncate w-full text-right ${result === "Error" ? "text-accent-red" : "text-text-primary"}`}>
               {result || "0"}
             </div>
@@ -179,9 +185,17 @@ export default function CalculatorPage() {
               </div>
             ) : (
               history.map((item, idx) => (
-                <div key={idx} className="flex flex-col text-right group cursor-pointer hover:bg-bg-tertiary p-2 rounded-lg transition-colors" onClick={() => { setExpression(item.expr); setResult(item.res); }}>
-                  <span className="text-xs text-text-secondary font-mono mb-1">{item.expr}</span>
-                  <span className="text-lg font-semibold text-text-primary group-hover:text-accent-active transition-colors">{item.res}</span>
+                <div key={idx} className="flex items-center justify-between group hover:bg-bg-tertiary p-2 rounded-lg transition-colors">
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); setHistory(prev => prev.filter((_, i) => i !== idx)); }}
+                    className="p-2 text-text-muted hover:text-accent-red opacity-0 group-hover:opacity-100 transition-all rounded-lg"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  <div className="flex flex-col text-right cursor-pointer flex-1" onClick={() => { setExpression(item.expr); setResult(item.res); }}>
+                    <span className="text-xs text-text-secondary font-mono mb-1">{item.expr}</span>
+                    <span className="text-lg font-semibold text-text-primary group-hover:text-accent-active transition-colors">{item.res}</span>
+                  </div>
                 </div>
               ))
             )}

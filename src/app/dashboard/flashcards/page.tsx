@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { motion, AnimatePresence } from "framer-motion";
-import { BrainCircuit, Plus, Sparkles, Play, MoreVertical, Edit2, Trash2 } from "lucide-react";
+import { BrainCircuit, Plus, Sparkles, Play, MoreVertical, Edit2, Trash2, Shield } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
@@ -31,7 +32,7 @@ const initialDecks: Deck[] = [
 ];
 
 export default function FlashcardsPage() {
-  const [decks, setDecks] = useState<Deck[]>(initialDecks);
+  const [decks, setDecks] = useLocalStorage<Deck[]>("mrqry_flashcards", initialDecks);
   const [view, setView] = useState<"list" | "study" | "edit">("list");
   const [activeDeckId, setActiveDeckId] = useState<string | null>(null);
   
@@ -122,19 +123,19 @@ export default function FlashcardsPage() {
 
         <div className="relative w-full max-w-2xl aspect-[3/2] perspective-[1000px] mb-12">
           <motion.div
-            className="w-full h-full relative preserve-3d cursor-pointer"
+            className="w-full h-full relative [transform-style:preserve-3d] cursor-pointer"
             animate={{ rotateX: isFlipped ? 180 : 0 }}
             transition={{ type: "spring", stiffness: 260, damping: 20 }}
             onClick={() => setIsFlipped(!isFlipped)}
           >
             {/* Front */}
-            <div className="absolute inset-0 backface-hidden w-full h-full bg-bg-secondary border border-glass-border rounded-3xl shadow-shadow-card flex flex-col items-center justify-center p-12 text-center">
+            <div className="absolute inset-0 [backface-visibility:hidden] w-full h-full bg-bg-secondary border border-glass-border rounded-3xl shadow-shadow-card flex flex-col items-center justify-center p-12 text-center">
               <span className="text-3xl font-medium text-text-primary">{currentCard.front}</span>
               <p className="text-sm text-text-muted mt-8 absolute bottom-6">Click to flip</p>
             </div>
 
             {/* Back */}
-            <div className="absolute inset-0 backface-hidden w-full h-full bg-bg-secondary border border-accent-active rounded-3xl shadow-shadow-glow-violet flex flex-col items-center justify-center p-12 text-center [transform:rotateX(180deg)]">
+            <div className="absolute inset-0 [backface-visibility:hidden] w-full h-full bg-bg-secondary border border-accent-active rounded-3xl shadow-shadow-glow-violet flex flex-col items-center justify-center p-12 text-center [transform:rotateX(180deg)]">
               <span className="text-xl leading-relaxed text-text-primary">
                 {currentCard.back}
               </span>
@@ -243,7 +244,10 @@ export default function FlashcardsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-display font-bold text-text-primary mb-1">Flashcards</h1>
-          <p className="text-text-secondary text-sm">Create decks, add custom cards, and review.</p>
+          <p className="text-text-secondary text-sm mb-2">Create decks, add custom cards, and review.</p>
+          <div className="text-xs text-accent-green flex items-center gap-1.5 font-medium bg-accent-green/10 w-fit px-2.5 py-1 rounded-full border border-accent-green/20">
+            <Shield className="w-3.5 h-3.5" /> Privacy is our policy. Your notes, your privacy. Stored locally.
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <Button variant="secondary" className="gap-2 border-accent-active/50 text-accent-active hover:bg-accent-active/10">

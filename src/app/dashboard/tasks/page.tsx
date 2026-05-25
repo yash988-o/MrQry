@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Plus, Filter } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -9,7 +10,7 @@ import { mockTasks } from "@/data/mockTasks";
 import TaskItem from "@/components/dashboard/TaskItem";
 
 export default function TasksPage() {
-  const [tasks, setTasks] = useState(mockTasks);
+  const [tasks, setTasks] = useLocalStorage("mrqry_tasks", mockTasks);
   const [activeTab, setActiveTab] = useState("all");
 
   const toggleTask = (id: string) => {
